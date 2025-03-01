@@ -22,7 +22,3 @@ venv/
 # Ignore logs
 logs/
 *.log
-
-# Ignore notebooks
-notebooks/
-*.ipynb
