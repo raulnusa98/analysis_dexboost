@@ -4,100 +4,116 @@ import pandas as pd
 import logging
 from typing import Optional
 
-logging.basicConfig(level=logging.WARNING)  # Solo mostrar warnings y errores
+logging.basicConfig(level=logging.WARNING)  # Only show warnings and errors
 
-def conectar_db(ruta_db: str) -> sqlite3.Connection:
+def connect_db(db_path: str) -> sqlite3.Connection:
     """
-    Conecta a una base de datos SQLite.
+    Connects to a SQLite database.
 
     Args:
-        ruta_db (str): Ruta al archivo de la base de datos.
+        db_path (str): Path to the database file.
 
     Returns:
-        sqlite3.Connection: Conexión a la base de datos SQLite.
+        sqlite3.Connection: Connection to SQLite database.
     """
     try:
-        conn = sqlite3.connect(ruta_db)
-        logging.info(f"Conexión exitosa a la base de datos: {ruta_db}")
+        conn = sqlite3.connect(db_path)
+        logging.info(f"Successfully connected to database: {db_path}")
         return conn
     except sqlite3.Error as e:
-        logging.error(f"Error al conectar con la base de datos: {e}")
+        logging.error(f"Error connecting to database: {e}")
         raise
 
-def cerrar_conexion(conn: Optional[sqlite3.Connection]) -> None:
+def close_connection(conn: Optional[sqlite3.Connection]) -> None:
     """
-    Cierra la conexión a la base de datos SQLite.
+    Closes the SQLite database connection.
 
     Args:
-        conn (Optional[sqlite3.Connection]): Conexión a cerrar.
+        conn (Optional[sqlite3.Connection]): Connection to close.
     """
     try:
         if conn:
             conn.close()
-            logging.info("Conexión cerrada correctamente.")
+            logging.info("Connection closed successfully.")
     except sqlite3.Error as e:
-        logging.error(f"Error al cerrar la conexión: {e}")
+        logging.error(f"Error closing connection: {e}")
         raise
 
-def cargar_tabla(conn: sqlite3.Connection, tabla: str) -> pd.DataFrame:
+def load_table(conn: sqlite3.Connection, table: str) -> pd.DataFrame:
     """
-    Carga una tabla de SQLite en un DataFrame de pandas.
+    Loads a SQLite table into a pandas DataFrame.
 
     Args:
-        conn (sqlite3.Connection): Conexión a la base de datos.
-        tabla (str): Nombre de la tabla a cargar.
+        conn (sqlite3.Connection): Database connection.
+        table (str): Name of table to load.
 
     Returns:
-        pd.DataFrame: Datos de la tabla cargada en un DataFrame.
+        pd.DataFrame: Table data loaded into DataFrame.
     """
     try:
-        logging.info(f"Cargando tabla '{tabla}' desde la base de datos.")
-        query = f"SELECT * FROM {tabla}"
+        logging.info(f"Loading table '{table}' from database.")
+        query = f"SELECT * FROM {table}"
         df = pd.read_sql(query, conn)
-        logging.info(f"Tabla '{tabla}' cargada con éxito. {len(df)} filas encontradas.")
+        logging.info(f"Table '{table}' loaded successfully. {len(df)} rows found.")
         return df
     except sqlite3.DatabaseError as e:
-        logging.error(f"Error al cargar la tabla '{tabla}': {e}")
+        logging.error(f"Error loading table '{table}': {e}")
         raise
 
-def guardar_tabla(conn: sqlite3.Connection, df: pd.DataFrame, tabla: str) -> None:
+def save_table(conn: sqlite3.Connection, df: pd.DataFrame, table: str) -> None:
     """
-    Guarda un DataFrame en una tabla de SQLite.
+    Saves a DataFrame to a SQLite table.
 
     Args:
-        conn (sqlite3.Connection): Conexión a la base de datos SQLite.
-        df (pd.DataFrame): DataFrame a guardar.
-        tabla (str): Nombre de la tabla donde se guardará el DataFrame.
+        conn (sqlite3.Connection): SQLite database connection.
+        df (pd.DataFrame): DataFrame to save.
+        table (str): Name of table where DataFrame will be saved.
     """
     try:
-        df.to_sql(tabla, conn, if_exists="replace", index=False)
-        logging.info(f"Datos guardados exitosamente en la tabla '{tabla}' ({len(df)} filas).")
+        df.to_sql(table, conn, if_exists="replace", index=False)
+        logging.info(f"Data successfully saved to table '{table}' ({len(df)} rows).")
     except Exception as e:
-        logging.error(f"Error al guardar la tabla '{tabla}': {e}")
+        logging.error(f"Error saving table '{table}': {e}")
         raise
 
 def get_latest_db(folder_path: str) -> str:
     """
-    Devuelve la ruta al archivo de base de datos más reciente en el directorio especificado.
+    Returns the path to the most recent database file in the specified directory.
 
     Args:
-        folder_path (str): Ruta al directorio que contiene las bases de datos.
+        folder_path (str): Path to directory containing databases.
 
     Returns:
-        str: Ruta al archivo de base de datos más reciente.
+        str: Path to most recent database file.
     """
     try:
         db_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith(".db")]
         if not db_files:
-            raise FileNotFoundError("No se encontraron archivos .db en la carpeta especificada.")
+            raise FileNotFoundError("No .db files found in specified folder.")
 
         latest_file = max(db_files, key=os.path.getmtime)
-        logging.info(f"Base de datos más reciente encontrada: {latest_file}")
+        logging.info(f"Most recent database found: {latest_file}")
         return latest_file
     except Exception as e:
-        logging.error(f"Error al obtener la base de datos más reciente: {e}")
+        logging.error(f"Error getting most recent database: {e}")
         raise
 
-if __name__ == "__main__":
-    pass
+def query_table(conn: sqlite3.Connection, query: str) -> pd.DataFrame:
+    """
+    Executes a SQL query and returns the result as a DataFrame.
 
+    Args:
+        conn (sqlite3.Connection): Database connection.
+        query (str): SQL query to execute.
+
+    Returns:
+        pd.DataFrame: Query result as DataFrame.
+    """
+    try:
+        logging.info(f"Executing custom query:\n{query}")
+        df = pd.read_sql_query(query, conn)
+        logging.info(f"Query returned {len(df)} rows.")
+        return df
+    except Exception as e:
+        logging.error(f"Error executing query: {e}")
+        raise
