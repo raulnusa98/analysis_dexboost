@@ -24,6 +24,7 @@ If you are collecting similar data with Dexboost's detection system, this repo s
 
 ## Project structure
 
+```
 dexboost/
 │
 ├── data/                        # Contains DB, filtered tokens and PDF reports
@@ -32,20 +33,20 @@ dexboost/
 │   └── parameters.txt           # Main config (filters, plot limits, etc.)
 │
 ├── env_scripts/                 # Modular code used by main.py
-    ├── db_utils.py              # Connects to sqlite3 db and loads raw tables
-    ├── eda.py                   # Generates EDA report
+│   ├── db_utils.py              # Connects to SQLite DB and loads raw tables
+│   ├── eda.py                   # Generates EDA report
 │   ├── pipeline.py              # Unifies preprocessing + summary + target
-│   ├── plot_utils.py            # Price evolution charts and PDF generator with tokens passing the filters
+│   ├── plot_utils.py            # Price evolution charts and filtered token PDF
 │   ├── preprocessing.py         # Cleans data, explodes price data, correct dtypes, etc.
-│   └── target_definition.py     # Little script to handle IsWorthIt conditions. Very easy to add or eliminate conditionals regarding what you would consider Worth It
+│   └── target_definition.py     # Simple logic to create the IsWorthIt label
 │
 ├── notebooks/
 │   └── modeling_analysis.ipynb  # Model training, tuning & exploration
 │
-│
 ├── main.py                      # Run this to launch full pipeline
 ├── .gitignore                   # Hides data, envs, logs, etc.
 └── README.md                    # You’re here
+```
 
 ## How it works
 
